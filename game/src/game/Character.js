@@ -8,7 +8,7 @@ class Character {
         this.strength = 10;
         this.dexterity = 10;
         this.intelligence = 10;
-        this.inventory = [];
+        this.inventory = {};
     }
 
     levelUp() {
@@ -20,15 +20,45 @@ class Character {
         this.intelligence += 2;
     }
 
-    addToInventory(item) {
-        this.inventory.push(item);
+    addToInventory(item, quantity = 1) {
+        if (this.inventory[item]) {
+            this.inventory[item] += quantity;
+        } else {
+            this.inventory[item] = quantity;
+        }
     }
 
-    removeFromInventory(item) {
-        const index = this.inventory.indexOf(item);
-        if (index > -1) {
-            this.inventory.splice(index, 1);
+    removeFromInventory(item, quantity = 1) {
+        if (this.inventory[item]) {
+            this.inventory[item] -= quantity;
+            if (this.inventory[item] <= 0) {
+                delete this.inventory[item];
+            }
+            return true;
         }
+        return false;
+    }
+
+    useItem(item) {
+        if (this.removeFromInventory(item)) {
+            // Define item effects here
+            const itemEffects = {
+                "Health Potion": () => {
+                    this.health = Math.min(this.health + 20, this.maxHealth);
+                    return "Restored 20 health.";
+                },
+                "Strength Potion": () => {
+                    this.strength += 5;
+                    return "Increased strength by 5.";
+                },
+                // Add more items and their effects as needed
+            };
+            
+            if (itemEffects[item]) {
+                return itemEffects[item]();
+            }
+        }
+        return "Item not found or has no effect.";
     }
 
     toJSON() {
@@ -43,6 +73,18 @@ class Character {
             intelligence: this.intelligence,
             inventory: this.inventory
         };
+    }
+
+    static fromJSON(json) {
+        const character = new Character(json.name, json.className);
+        character.level = json.level;
+        character.health = json.health;
+        character.maxHealth = json.maxHealth;
+        character.strength = json.strength;
+        character.dexterity = json.dexterity;
+        character.intelligence = json.intelligence;
+        character.inventory = json.inventory || {};
+        return character;
     }
 }
 
