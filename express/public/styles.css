@@ -1,0 +1,169 @@
+/* General Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    text-align: center;
+    color: #00ffcc;
+    text-shadow: 0 0 10px #00ffcc;
+    margin-bottom: 40px;
+}
+
+#items-container {
+    margin-bottom: 20px;
+    width: 80%;
+    max-width: 800px;
+}
+
+.item {
+    border: 1px solid #00ffcc;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #1e1e1e;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #00ffcc;
+    transition: transform 0.3s ease;
+}
+
+.item:hover {
+    transform: scale(1.05);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    max-width: 400px;
+    margin-bottom: 20px;
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #00ffcc;
+}
+
+input {
+    margin-bottom: 10px;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #333;
+    color: #00ffcc;
+    box-shadow: inset 0 0 5px #00ffcc;
+}
+
+button {
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #00ffcc;
+    color: #121212;
+    box-shadow: 0 0 10px #00ffcc;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button:hover {
+    background-color: #00e6b8;
+    transform: scale(1.05);
+}
+
+/* Add a glow effect to the input fields and buttons */
+input:focus, button:focus {
+    outline: none;
+    box-shadow: 0 0 10px #00ffcc;
+}
+
+/* Add a subtle animation to the form elements */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+form, .item {
+    animation: fadeIn 0.5s ease;
+}
+
+/* Chat Styles */
+#chat-container {
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #00ffcc;
+    margin-top: 20px;
+}
+
+#chat-box {
+    height: 300px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #121212;
+    border: 1px solid #00ffcc;
+    border-radius: 5px;
+}
+
+#chat-box .message {
+    margin-bottom: 10px;
+}
+
+#chat-box .message.user {
+    text-align: right;
+    color: #00ffcc;
+}
+
+#chat-box .message.bot {
+    text-align: left;
+    color: #ffffff;
+}
+
+#chat-form {
+    display: flex;
+}
+
+#chat-input {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #333;
+    color: #00ffcc;
+    box-shadow: inset 0 0 5px #00ffcc;
+    margin-right: 10px;
+}
+
+#chat-form button {
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #00ffcc;
+    color: #121212;
+    box-shadow: 0 0 10px #00ffcc;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#chat-form button:hover {
+    background-color: #00e6b8;
+    transform: scale(1.05);
+}

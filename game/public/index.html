@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollama Persistent Adventure</title>
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+    <div id="start-screen" class="active">
+        <h1>Welcome to Ollama Adventure</h1>
+        <input type="text" id="player-name" placeholder="Enter your name">
+        <select id="character-class">
+            <option value="warrior">Warrior</option>
+            <option value="mage">Mage</option>
+            <option value="rogue">Rogue</option>
+        </select>
+        <button onclick="startNewGame()">Start New Game</button>
+        <input type="text" id="session-id" placeholder="Enter session ID">
+        <button onclick="loadGame()">Load Game</button>
+    </div>
+
+    <div id="game-screen">
+        <h1>Ollama Adventure</h1>
+        <p>Session ID: <span id="current-session-id"></span></p>
+        <div id="character-info"></div>
+        <div id="story"></div>
+        <div id="choices"></div>
+    </div>
+
+    <script>
+        let currentSessionId;
+        let currentGameState;
+        const storyElement = document.getElementById('story');
+        const choicesElement = document.getElementById('choices');
+        const characterInfoElement = document.getElementById('character-info');
+
+        function updateCharacterInfo() {
+            if (currentGameState && currentGameState.character) {
+                const character = currentGameState.character;
+                characterInfoElement.innerHTML = `
+                    <h2>${character.name} the ${character.className}</h2>
+                    <p>Level: ${character.level}</p>
+                    <p>Health: ${character.health}/${character.maxHealth}</p>
+                    <p>Strength: ${character.strength}</p>
+                    <p>Dexterity: ${character.dexterity}</p>
+                    <p>Intelligence: ${character.intelligence}</p>
+                    <h3>Inventory:</h3>
+                    <ul>
+                        ${character.inventory.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                `;
+            }
+        }
+
+        async function startNewGame() {
+            const playerName = document.getElementById('player-name').value;
+            const characterClass = document.getElementById('character-class').value;
+            if (!playerName) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            const response = await fetch('/start-game', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ playerName, characterClass })
+            });
+            const data = await response.json();
+            currentSessionId = data.sessionId;
+            currentGameState = data.gameState;
+            document.getElementById('current-session-id').textContent = currentSessionId;
+            
+            document.getElementById('start-screen').classList.remove('active');
+            document.getElementById('game-screen').classList.add('active');
+            
+            updateCharacterInfo();
+            await takeAction('start the game');
+        }
+
+        async function loadGame() {
+            const sessionId = document.getElementById('session-id').value;
+            if (!sessionId) {
+                alert('Please enter a session ID');
+                return;
+            }
+            
+            const response = await fetch(`/load-game/${sessionId}`);
+            if (response.ok) {
+                currentSessionId = sessionId;
+                currentGameState = await response.json();
+                document.getElementById('current-session-id').textContent = currentSessionId;
+                
+                document.getElementById('start-screen').classList.remove('active');
+                document.getElementById('game-screen').classList.add('active');
+                
+                updateCharacterInfo();
+                storyElement.textContent = `Game loaded. You are in the ${currentGameState.currentScene} scene.`;
+                await takeAction('continue the game');
+            } else {
+                alert('Failed to load game. Please check the session ID.');
+            }
+        }
+
+        async function takeAction(action) {
+            try {
+                const response = await fetch('/game', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessionId: currentSessionId, action }),
+                });
+
+                const gameUpdate = await response.json();
+                
+                currentGameState = gameUpdate.gameState;
+                updateCharacterInfo();
+                
+                storyElement.textContent = gameUpdate.description;
+                
+                choicesElement.innerHTML = '';
+                gameUpdate.choices.forEach(choice => {
+                    const button = document.createElement('button');
+                    button.textContent = choice;
+                    button.onclick = () => takeAction(choice);
+                    choicesElement.appendChild(button);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                storyElement.textContent = 'An error occurred. Please try again.';
+            }
+        }
+    </script>
+</body>
+</html>
